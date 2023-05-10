@@ -1,12 +1,10 @@
 // global styles shared across the entire site
 import * as React from 'react'
-import type { AppProps } from 'next/app'
-import { useRouter } from 'next/router'
-
-import * as Fathom from 'fathom-client'
+import {useEffect} from 'react'
+import type {AppProps} from 'next/app'
+import {useRouter} from 'next/router'
 // used for rendering equations (optional)
 import 'katex/dist/katex.min.css'
-import posthog from 'posthog-js'
 // used for code syntax highlighting (optional)
 import 'prismjs/themes/prism-coy.css'
 // core styles shared by all of react-notion-x (required)
@@ -19,47 +17,33 @@ import 'styles/notion.css'
 // global style overrides for prism theme (optional)
 import 'styles/prism-theme.css'
 
-import { bootstrap } from '@/lib/bootstrap-client'
-import {
-  fathomConfig,
-  fathomId,
-  isServer,
-  posthogConfig,
-  posthogId
-} from '@/lib/config'
+import {bootstrap} from '@/lib/bootstrap-client'
+import {isServer} from '@/lib/config'
+import {analytics} from '../utils/firebase'
+import {logEvent as firebaseLogEvent} from 'firebase/analytics'
 
 if (!isServer) {
   bootstrap()
 }
 
 export default function App({ Component, pageProps }: AppProps) {
-  const router = useRouter()
+  const routers = useRouter()
 
-  React.useEffect(() => {
-    function onRouteChangeComplete() {
-      if (fathomId) {
-        Fathom.trackPageview()
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      const logEvent = (url: string) => {
+        firebaseLogEvent(analytics!, 'page_view', { page_path: url })
       }
 
-      if (posthogId) {
-        posthog.capture('$pageview')
+      routers.events.on('routeChangeComplete', logEvent)
+      logEvent(window.location.pathname)
+
+      return () => {
+        routers.events.off('routeChangeComplete', logEvent)
       }
     }
-
-    if (fathomId) {
-      Fathom.load(fathomId, fathomConfig)
-    }
-
-    if (posthogId) {
-      posthog.init(posthogId, posthogConfig)
-    }
-
-    router.events.on('routeChangeComplete', onRouteChangeComplete)
-
-    return () => {
-      router.events.off('routeChangeComplete', onRouteChangeComplete)
-    }
-  }, [router.events])
+  }, [])
 
   return <Component {...pageProps} />
 }

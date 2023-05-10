@@ -10,7 +10,7 @@ export default siteConfig({
   // basic site info (required)
   name: "Maius Team's Blog",
   domain: 'blog.maius.fun',
-  author: 'Travis Fischer',
+  author: 'Maius Team',
 
   // open graph metadata (optional)
   description: "Maius Team's Blog - All about Solana programming",
@@ -18,7 +18,7 @@ export default siteConfig({
   // social usernames (optional)
   twitter: 'MaiusFun',
   github: 'Maius-Protocol',
-  linkedin: 'fisch2',
+  // linkedin: 'fisch2',
   // mastodon: '#', // optional mastodon profile URL, provides link verification
   // newsletter: '#', // optional newsletter URL
   // youtube: '#', // optional youtube channel name or `channel/UCGbXXXXXXXXXXXXXXXXXXXXXX`
